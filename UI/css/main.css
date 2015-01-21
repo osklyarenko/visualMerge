@@ -84,6 +84,31 @@ header {
 }
 
 /**
+ * Chart D3
+ */
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #b6b6b6;
+  shape-rendering: crispEdges;
+}
+.tick text{
+  fill: #999;
+}
+g.journal.active{
+  cursor: pointer;
+}
+text.label{
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+}
+text.value{
+  font-size: 12px;
+  font-weight: bold;
+}
+
+/**
  * Footer
  */
 footer {
