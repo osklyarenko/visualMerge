@@ -1,10 +1,9 @@
 
-VisualMerge.controller('MainController', function($scope, MainFactory) {
-  $scope.filesStack = {};
+VisualMerge.controller('MainController', function($scope, $controller) {
+  var chartEl = $('#chart').get(0);
+  var chartController = $scope.$new();
+  $controller('ChartController', { $scope: chartController });
 
-  function init_() {
-    $scope.filesStack = MainFactory.getFiles();
-  }
-
-  init_();
+  chartController.setData(API_RESPONSE_STUB);
+  chartController.render(chartEl);
 });

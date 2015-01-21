@@ -12,7 +12,6 @@ main {
   height: auto !important;
   height: 100%;
 }
-
 .header-main,
 .content-main,
 .footer-main {
@@ -20,7 +19,6 @@ main {
   min-width: 1000px;
   padding: 0 100px;
 }
-
 
 /**
  * Header
@@ -37,7 +35,6 @@ header {
   background: linear-gradient(top, #ffffff, #e8e8e8);
   border-bottom: 1px solid #a1a1a1;
 }
-
 .logo {
   height: 52px;
   line-height: 48px;
@@ -55,7 +52,6 @@ header {
   text-decoration: none;
 }
 
-
 /**
  * Content
  */
@@ -63,47 +59,33 @@ header {
   padding-bottom: 70px;
 }
 
-.middle-shadow {
-  width: 100%;
-  margin: 20px 0;
-  height: 20px;
-}
-
-.h-line {
-  border-bottom: 1px solid #bdbdbd;
-}
-.hb-line {
-  border-bottom: 2px solid #bdbdbd;
-}
-.hbb-line {
-  border-bottom: 1px solid #fff;
-  border-top: 1px solid #bdbdbd;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.40);
-  height: 0;
-  margin: 20px 0 30px;
-}
-
 /**
- * Chart D3
+ * Chart
  */
+.chart-cnt {
+  margin: 50px 0 0;
+}
+.chart-cnt svg {
+  float: right;
+}
 .axis path,
 .axis line {
   fill: none;
   stroke: #b6b6b6;
   shape-rendering: crispEdges;
 }
-.tick text{
+.tick text {
   fill: #999;
 }
-g.journal.active{
+g.journal.active {
   cursor: pointer;
 }
-text.label{
+text.label {
   font-size: 12px;
   font-weight: bold;
   cursor: pointer;
 }
-text.value{
+text.value {
   font-size: 12px;
   font-weight: bold;
 }
@@ -121,6 +103,7 @@ footer {
   border-top: 1px solid #ffffff;
   padding: 14px 100px;
   text-align: right;
+  font-size: 12px;
 }
 .founded,
 .gray-line {
@@ -142,10 +125,12 @@ strong {
 .grey {
   color: #777 !important;
 }
-.text-left {
-  text-align: left !important;
+.text-center {
+  text-align: center;
 }
-
+.text-left {
+  text-align: left;
+}
 .shadow-effect {
   position:relative;
   -webkit-box-shadow:0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
@@ -175,4 +160,8 @@ strong {
   -ms-transform:skew(8deg) rotate(3deg);
   -o-transform:skew(8deg) rotate(3deg);
   transform:skew(8deg) rotate(3deg);
+}
+.clr {
+  clear: both;
+  display: block;
 }
