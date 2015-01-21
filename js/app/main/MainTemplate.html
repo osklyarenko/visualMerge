@@ -1,0 +1,16 @@
+<h2>Changes:</h2>
+<p>Main screen with grid</p>
+
+<div class="row">
+  <div class="col-md-3" ng-repeat="(index, files) in filesStack">
+    <span class="hb-line">Date: {{index}}</span>
+
+    <div class="h-line" ng-repeat="(index, file) in files">
+      <div>File Name: {{file.name}}</div>
+      <div>Changes: {{file.changes}}</div>
+    </div>
+
+
+
+  </div>
+</div>
