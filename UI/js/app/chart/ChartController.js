@@ -9,16 +9,18 @@ VisualMerge.controller('ChartController', function($scope) {
       end_year = 2013;
 
   function _render(element) {
+    var startTime = new Date;
+
+    var fragment = document.createDocumentFragment();
     var c = d3.scale.category20c();
     var x = d3.scale.linear().range([0, width]);
     var xAxis = d3.svg.axis().scale(x).orient("top");
-
     xAxis.tickFormat(d3.format("0000"));
 
-    var svg = d3.select(element).append("svg")
+    var svg = d3.select(fragment).append("svg")
       .attr("width", width + margin.left + margin.right)
       .attr("height", height + margin.top + margin.bottom)
-      //.style("margin-left", margin.left + "px")
+      //.style("position", "absolute")
       .append("g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
@@ -73,6 +75,10 @@ VisualMerge.controller('ChartController', function($scope) {
         .on("mouseover", mouseover)
         .on("mouseout", mouseout);
     }
+
+    element.innerHTML = '';
+    element.appendChild(fragment);
+    console.log('render time:', (new Date) - startTime);
   }
 
   function mouseover(p) {
