@@ -3,6 +3,27 @@ class Merge < ActiveRecord::Base
 		
 end
 
+def read_HEAD(repo)
+	sha = ""
+	run_shell_parse_output 'git rev-parse --short HEAD', repo do |pipe|
+		sha = pipe.gets
+		sha.strip!
+	end
+
+	sha
+end
+
+def register_merge(repo)
+	last_merge = Merge.last
+
+	new_head = read_HEAD(repo)
+	old_head = new_head
+	old_head = last_merge.new_head if last_merge
+
+	Merge.create :old_head => old_head,
+		:new_head => new_head
+end
+
 def ensure_dir(path, &code)
 	dir = Dir.pwd
 	begin
