@@ -32,8 +32,12 @@ when 'init'
 	run_shell 'mkdir .visualMerge', '.'
 	
 	run_shell "rm -f '.git/hooks/post-merge'", GIT_REPO_HOME
-	run_shell "ln -s '#{Dir.pwd}/git/post-merge' post-merge", "#{GIT_REPO_HOME}/.git/hooks"
-	
+	run_shell "ln -s '#{Dir.pwd}/git/post-merge' post-merge", "#{GIT_REPO_HOME}/.git/hooks"	
+	text = <<-EOS
+		#!/bin/bash
+		echo "VISUAL_MERGE_HOME = '#{Dir.pwd}'" > .git/hooks/visual_merge_config.rb
+	EOS
+	run_shell text, GIT_REPO_HOME
 	
 	ensure_dir '.visualMerge' do
 		init_db	

@@ -1,34 +1,31 @@
- #!/usr/bin/ruby
+ #!/bin/bash
 
-puts 'in post_merge'
+/usr/bin/ruby <<-EORUBY
+	
+	def run_shell(cmd, path)
+		ensure_dir(path) do
+			puts "-> Changed wdir to #{Dir.pwd}"
+			puts "-> Running command '#{cmd}'"
 
-def run_shell(cmd, path)
-	ensure_dir(path) do
-		puts "-> Changed wdir to #{Dir.pwd}"
-		puts "-> Running command '#{cmd}'"
+			system cmd	
+		end
 
-		system cmd	
+
+		$? == 0
 	end
 
-	if ($?.success?)
-		puts "!> Process PID #{$?.pid} exited with status code #{$?.exitstatus}"		
-		return true
-	end	
-
-	return false, $?.exitstatus
-end
-
-def ensure_dir(path, &code)
-	dir = Dir.pwd
-	begin
-		Dir.chdir path
-		code.call
-	ensure
-		Dir.chdir dir
+	def ensure_dir(path, &code)
+		dir = Dir.pwd
+		begin
+			Dir.chdir path
+			code.call
+		ensure
+			Dir.chdir dir
+		end
 	end
-end
 
-
-ensure_dir ENV['VISUAL_MERGE_HOME'] do
-	`.visualMerge/git/register_merge.rb`	
-end
+	load "./visual_merge_config.rb"
+ 
+	run_shell "/usr/bin/env ruby git/register_merge.rb", VISUAL_MERGE_HOME
+	
+EORUBY
