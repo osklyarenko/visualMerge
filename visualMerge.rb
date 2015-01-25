@@ -23,6 +23,14 @@ def init_db
 		end
 	end
 
+	sha = ""
+	run_shell_parse_output 'git rev-parse --short HEAD', GIT_REPO_HOME do |pipe|
+		sha = pipe.gets
+		sha.strip!
+	end
+
+	Merge.create :old_head => sha,
+		:new_head => sha
 end
 
 action = ARGV[0]
@@ -33,11 +41,12 @@ when 'init'
 	
 	run_shell "rm -f '.git/hooks/post-merge'", GIT_REPO_HOME
 	run_shell "ln -s '#{Dir.pwd}/git/post-merge' post-merge", "#{GIT_REPO_HOME}/.git/hooks"	
-	text = <<-EOS
+	
+	config_script = <<-EOS
 		#!/bin/bash
 		echo "VISUAL_MERGE_HOME = '#{Dir.pwd}'" > .git/hooks/visual_merge_config.rb
 	EOS
-	run_shell text, GIT_REPO_HOME
+	run_shell config_script, GIT_REPO_HOME
 	
 	ensure_dir '.visualMerge' do
 		init_db	

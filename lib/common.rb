@@ -1,3 +1,8 @@
+
+class Merge < ActiveRecord::Base
+		
+end
+
 def ensure_dir(path, &code)
 	dir = Dir.pwd
 	begin
@@ -23,4 +28,20 @@ def run_shell(cmd, path)
 	end	
 
 	return false, $?.exitstatus
+end
+
+def run_shell_parse_output(cmd, path, &parser)
+	ensure_dir(path) do
+		puts "-> Changed wdir to #{Dir.pwd}"
+		puts "-> Running command '#{cmd}'"
+
+		pipe = IO.popen cmd	do | pp |
+			
+			parser.call(pp)		
+		end
+		
+	end
+
+	puts "!> Process PID #{$?.pid} exited with status code #{$?.exitstatus}" unless $?.success?
+	return $?.success?, $?.exitstatus		
 end
