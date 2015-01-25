@@ -24,7 +24,7 @@
 		end
 	end
 
-	load "./visual_merge_config.rb"
+	load '.git/hooks/visual_merge_config.rb'
  
 	run_shell "/usr/bin/env ruby git/register_merge.rb", VISUAL_MERGE_HOME
 	
