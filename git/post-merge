@@ -1,4 +1,4 @@
- #!/usr/bin/env ruby
+ #!/usr/bin/ruby
 
 puts 'in post_merge'
 
