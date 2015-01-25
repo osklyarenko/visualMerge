@@ -1,1 +1,1 @@
-GIT_REPO_HOME=`PWD`
+GIT_REPO_HOME=Dir.pwd

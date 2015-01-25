@@ -31,8 +31,9 @@ case action
 when 'init'
 	run_shell 'mkdir .visualMerge', '.'
 	
-	run_shell "rm '#{GIT_REPO_HOME}/.git/hooks/post-merge'", '.'
-	run_shell "ln -s '#{Dir.pwd}/.visualMerge/git/post-merge', '#{GIT_REPO_HOME}/.git/hooks/post-merge'", '.'
+	run_shell "rm -f '.git/hooks/post-merge'", GIT_REPO_HOME
+	run_shell "ln -s '#{Dir.pwd}/git/post-merge' post-merge", "#{GIT_REPO_HOME}/.git/hooks"
+	
 	
 	ensure_dir '.visualMerge' do
 		init_db	
