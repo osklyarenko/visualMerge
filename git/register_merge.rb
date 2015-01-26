@@ -1,12 +1,13 @@
 require 'active_record'
 
-load '.git/hooks/common.rb'
-
 puts 'Registering merge'
+
+load 'config.rb'
+load 'lib/common.rb'
 
 ActiveRecord::Base.establish_connection(
 	:adapter => 'sqlite3',
-	:database => '.git/hooks/visualMerge.db'		
+	:database => '.visualMerge/visualMerge.db'		
 )
 
-register_merge Dir.pwd
+register_merge GIT_REPO_HOME

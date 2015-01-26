@@ -1,31 +1,15 @@
  #!/bin/bash
 
-/usr/bin/ruby <<-EORUBY
-	
-	def run_shell(cmd, path)
-		ensure_dir(path) do
-			puts "-> Changed wdir to #{Dir.pwd}"
-			puts "-> Running command '#{cmd}'"
+/usr/bin/ruby <<-EORUBY	
 
-			system cmd	
-		end
+load '.git/hooks/visual_merge_config.rb'
 
-
-		$? == 0
-	end
-
-	def ensure_dir(path, &code)
-		dir = Dir.pwd
-		begin
-			Dir.chdir path
-			code.call
-		ensure
-			Dir.chdir dir
-		end
-	end
-
-	load '.git/hooks/visual_merge_config.rb'
- 
-	run_shell "/usr/bin/env ruby git/register_merge.rb", VISUAL_MERGE_HOME
+dir = Dir.pwd
+begin
+	Dir.chdir VISUAL_MERGE_HOME
+	system "/usr/bin/env ruby git/register_merge.rb"
+ensure
+	Dir.chdir dir
+end
 	
 EORUBY
