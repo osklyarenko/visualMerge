@@ -21,6 +21,34 @@ def init_db
 	register_merge GIT_REPO_HOME	
 end
 
+def git_changed_files(repo)
+	merge = Merge.last
+
+	return nil unless merge
+	return [] if merge.old_head == merge.new_head
+
+	files = []
+	run_shell_parse_output "git diff --name-only #{merge.old_head} #{merge.new_head}", repo do |pipe|
+		while file = pipe.gets
+			files << file.strip
+		end
+	end
+
+	file_map = {}
+	files.each do |file|
+		run_shell_parse_output "git log --pretty=%h___%cD --abbrev-commit #{merge.old_head} HEAD #{file}", repo do |pipe|
+			hashes = []
+			while hash = pipe.gets
+				hashes << hash.strip
+			end
+
+			file_map[file] = hashes
+		end
+	end
+
+	return file_map
+end
+
 ActiveRecord::Base.establish_connection(
 	:adapter => 'sqlite3',
 	:database => 'visualMerge.db'		
@@ -49,4 +77,8 @@ when 'init'
 		init_db	
 	end
 	
+when 'files'
+	ensure_dir '.visualMerge' do
+		puts git_changed_files GIT_REPO_HOME
+	end
 end
