@@ -28,7 +28,7 @@ def git_changed_files(repo)
 	return [] if merge.old_head == merge.new_head
 
 	files = []
-	run_shell_parse_output "git diff --name-only #{merge.old_head} #{merge.new_head}", repo do |pipe|
+	run_shell_parse_output "git diff --name-only #{merge.old_head}..#{merge.new_head}", repo do |pipe|
 		while file = pipe.gets
 			files << file.strip
 		end
@@ -36,13 +36,14 @@ def git_changed_files(repo)
 
 	file_map = {}
 	files.each do |file|
-		run_shell_parse_output "git log --pretty=%h___%cD --abbrev-commit #{merge.old_head} HEAD #{file}", repo do |pipe|
+		run_shell_parse_output "git log --pretty=%h___%cD --abbrev-commit #{merge.old_head}..HEAD #{file}", repo do |pipe|
 			hashes = []
 			while hash = pipe.gets
 				hashes << hash.strip
 			end
 
 			file_map[file] = hashes
+			puts "File: #{file}, #{hashes.size}"
 		end
 	end
 
