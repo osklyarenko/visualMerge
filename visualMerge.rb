@@ -3,6 +3,7 @@
 require 'rubygems'
 require 'active_record'
 require 'json'
+require 'time'
 
 load 'lib/common.rb'
 load 'config.rb'
@@ -39,7 +40,9 @@ def git_changed_files(repo)
 		run_shell_parse_output "git log --pretty=%h___%cD --abbrev-commit #{merge.old_head}..HEAD #{file}", repo do |pipe|
 			hashes = []
 			while hash = pipe.gets
-				hashes << hash.strip
+				hash.strip!
+				sha, time = hash.match(/^([a-z0-9]{7})___(.+)$/).captures
+				hashes << { :hash => sha, :time =>  Time.rfc2822(time) }
 			end
 
 			file_map[file] = hashes
