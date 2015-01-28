@@ -8,7 +8,7 @@ require 'time'
 load 'lib/common.rb'
 load 'config.rb'
 
-def init_db
+def init_db(repo)
 	
 	ActiveRecord::Schema.define do
 		create_table :merges, :force => true do |t|
@@ -19,7 +19,7 @@ def init_db
 		end
 	end
 
-	register_merge GIT_REPO_HOME	
+	register_merge repo	
 end
 
 def git_changed_files(repo)
@@ -53,36 +53,41 @@ def git_changed_files(repo)
 	return file_map
 end
 
-ActiveRecord::Base.establish_connection(
-	:adapter => 'sqlite3',
-	:database => 'visualMerge.db'		
-)
-
 action = ARGV[0]
 
 case action
 when 'init'
-	run_shell 'mkdir .visualMerge', '.'
-	
+	run_shell 'mkdir .visualMerge', GIT_REPO_HOME
+
 	run_shell "rm -f '.visualMerge/visualMerge.db'", GIT_REPO_HOME
 	run_shell "rm -f '.git/hooks/post-merge'", GIT_REPO_HOME
 	run_shell "rm -f '.git/hooks/common.rb'", GIT_REPO_HOME
 
 	run_shell "ln -s '#{Dir.pwd}/git/post-merge' post-merge", "#{GIT_REPO_HOME}/.git/hooks"	
 	run_shell "ln -s '#{Dir.pwd}/lib/common.rb' common.rb", "#{GIT_REPO_HOME}/.git/hooks"	
+
+
+	ensure_dir GIT_REPO_HOME do
+		ActiveRecord::Base.establish_connection(
+			:adapter => 'sqlite3',
+			:database => '.visualMerge/visualMerge.db'		
+		)
+
+		init_db '.'
+	end
 	
 	config_script = <<-EOS
 		#!/bin/bash
 		echo "VISUAL_MERGE_HOME = '#{Dir.pwd}'" > .git/hooks/visual_merge_config.rb
 	EOS
 	run_shell config_script, GIT_REPO_HOME
-	
-	ensure_dir '.visualMerge' do
-		init_db	
-	end
-	
+		
 when 'files'
-	ensure_dir '.visualMerge' do
-		puts git_changed_files GIT_REPO_HOME
+	ensure_dir GIT_REPO_HOME do
+		ActiveRecord::Base.establish_connection(
+			:adapter => 'sqlite3',
+			:database => '.visualMerge/visualMerge.db'		
+		)
+		puts git_changed_files '.'
 	end
 end
