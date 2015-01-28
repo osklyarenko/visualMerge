@@ -90,4 +90,17 @@ when 'files'
 		)
 		puts git_changed_files '.'
 	end
+when 'show'
+	ensure_dir GIT_REPO_HOME do
+		ActiveRecord::Base.establish_connection(
+			:adapter => 'sqlite3',
+			:database => '.visualMerge/visualMerge.db'		
+		)
+	
+		files = git_changed_files '.'
+
+		files.each_pair do |file_name, changes|
+			puts "#{changes.size}, #{file_name}"
+		end
+	end 
 end
