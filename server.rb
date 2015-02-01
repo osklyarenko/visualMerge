@@ -3,6 +3,7 @@
 require 'rubygems'
 require 'sinatra'
 require 'haml'
+require 'json'
 require 'active_record' 
 
 load 'visualMerge.rb'
@@ -12,7 +13,8 @@ get '/' do
 end
 
 get '/show' do
-	app = VisualMerge.new ['show']
-	
-	app.perform_action
+	content_type :json
+
+	app = VisualMerge.new ['show']	
+	app.perform_action.to_json
 end
