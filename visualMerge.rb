@@ -4,6 +4,7 @@ require 'rubygems'
 require 'active_record'
 require 'json'
 require 'time'
+require 'active_support/all'
 
 load 'lib/common.rb'
 load 'config.rb'
@@ -26,6 +27,69 @@ class VisualMerge
 		end
 
 		register_merge repo	
+	end
+
+	def git_read_iso_time(line)
+		DateTime.strptime(line, '%Y-%m-%d %H:%M:%S %z')
+	end
+
+	def git_oldest_hash_since(repo, since)
+		hash = ''
+
+		run_shell_parse_output "git log --pretty='%ci___%h'  --after '#{since}' | sort| head -n 1", repo do |pipe|
+			line = pipe.gets
+
+			_hash, _ = line.match(/^.*___(\w*)$/).captures
+			hash = _hash.strip if _hash 
+			# commit_time = DateTime.strptime line, '%Y-%m-%d %H:%M:%S %z'
+		end
+
+		hash
+	end	
+
+	def git_changed_files_in_hash_range(repo, old_hash, new_hash)
+		files = []
+
+		run_shell_parse_output "git diff --name-only #{old_hash}..#{new_hash}", repo do |pipe|
+			while file = pipe.gets
+				files << file.strip if file
+			end
+		end
+
+		files
+	end
+
+	def git_build_file_map_in_hash_range(repo, changed_files, old_hash, new_hash)
+		file_map = {}
+
+		changed_files.each do |file|
+			run_shell_parse_output "git log --pretty=%h___%ci --abbrev-commit #{old_hash}..#{new_hash} #{file}", repo do |pipe|
+				hashes = []
+				while hash = pipe.gets
+					hash.strip!
+					sha, time = hash.match(/^([a-z0-9]*)___(.+)$/).captures
+					puts "time " + time
+					hashes << { :hash => sha, :time =>  git_read_iso_time(time) }
+				end
+
+				file_map[file] = hashes
+				puts "#{hashes.size}, #{file}"
+			end
+		end
+
+		file_map		
+	end
+
+	def git_changed_files_since_yesterday(repo)
+		hash = git_oldest_hash_since GIT_REPO_HOME, 1.day.ago.beginning_of_day
+
+		changed_files = git_changed_files_in_hash_range GIT_REPO_HOME, "#{hash}~1", 'HEAD'
+
+		file_map = git_build_file_map_in_hash_range GIT_REPO_HOME, changed_files, "#{hash}~1", 'HEAD'
+
+		puts "In git_changed_files_since_yesterday"
+		puts file_map
+		file_map
 	end
 
 	def git_changed_files(repo)
@@ -93,7 +157,7 @@ class VisualMerge
 					:adapter => 'sqlite3',
 					:database => '.visualMerge/visualMerge.db'		
 				)
-				puts git_changed_files '.'
+				puts git_changed_files_since_yesterday '.'
 			end
 		when 'show'
 			ensure_dir GIT_REPO_HOME do
@@ -102,7 +166,7 @@ class VisualMerge
 					:database => '.visualMerge/visualMerge.db'		
 				)
 			
-				files = git_changed_files '.'
+				files = git_changed_files_since_yesterday '.'
 
 				documents = []
 				files.each_pair do |file_name, changes|
@@ -126,6 +190,8 @@ class VisualMerge
 
 				puts "Documents"
 				puts documents
+
+				documents
 			end 
 		end
 	end
