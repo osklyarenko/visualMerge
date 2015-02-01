@@ -33,6 +33,10 @@ class VisualMerge
 		DateTime.strptime(line, '%Y-%m-%d %H:%M:%S %z')
 	end
 
+	def git_print_iso_time(time)
+		time.strftime '%Y-%m-%d %H:%M:%S %z'
+	end
+
 	def git_oldest_hash_since(repo, since)
 		hash = ''
 
@@ -67,9 +71,8 @@ class VisualMerge
 				hashes = []
 				while hash = pipe.gets
 					hash.strip!
-					sha, time = hash.match(/^([a-z0-9]*)___(.+)$/).captures
-					puts "time " + time
-					hashes << { :hash => sha, :time =>  git_read_iso_time(time) }
+					sha, commit_time = hash.match(/^([a-z0-9]*)___(.+)$/).captures
+					hashes << { :hash => sha, :time =>  commit_time }
 				end
 
 				file_map[file] = hashes
@@ -80,16 +83,53 @@ class VisualMerge
 		file_map		
 	end
 
-	def git_changed_files_since_yesterday(repo)
-		hash = git_oldest_hash_since GIT_REPO_HOME, 1.day.ago.beginning_of_day
+	def time_diff_in(from, to)
+		# in hours
+		from_hrs = from.to_i / 1.hour
+		to_hrs = to.to_i / 1.hour
+		
+		diff_hrs = to_hrs - from_hrs
+
+		# in days
+		from_days = from.to_i / 1.day
+		to_days = to.to_i / 1.day
+		
+		diff_days = to_days - from_days
+
+		# in weeks
+		from_wks = from.to_i / 1.week
+		to_wks = to.to_i / 1.week
+
+		diff_weeks = from_wks - to_wks
+
+		return {
+			:hours => diff_hrs.abs,
+			:days => diff_days.abs,
+			:weeks => diff_weeks.abs
+		}
+	end
+
+	def git_changed_files_since_yesterday(repo)		
+		yesterday = 1.day.ago.beginning_of_day
+
+		hash = git_oldest_hash_since GIT_REPO_HOME, yesterday
 
 		changed_files = git_changed_files_in_hash_range GIT_REPO_HOME, "#{hash}~1", 'HEAD'
 
 		file_map = git_build_file_map_in_hash_range GIT_REPO_HOME, changed_files, "#{hash}~1", 'HEAD'
+		
 
-		puts "In git_changed_files_since_yesterday"
-		puts file_map
-		file_map
+		time_diff = time_diff_in DateTime.now, yesterday
+		return {
+			:since => git_print_iso_time(yesterday),
+			:to => git_print_iso_time(DateTime.now),
+			
+			:hours_range =>  time_diff[:hours],
+			:days_range => time_diff[:days],
+			:weeks_range => time_diff[:weeks],
+
+			:file_map => file_map
+		}
 	end
 
 	def git_changed_files(repo)
@@ -166,15 +206,22 @@ class VisualMerge
 					:database => '.visualMerge/visualMerge.db'		
 				)
 			
-				files = git_changed_files_since_yesterday '.'
+				meta = git_changed_files_since_yesterday '.'
+				file_map = meta[:file_map]
+				hours_range = meta[:hours_range]
+				
+				to_date = git_read_iso_time meta[:to]
+				since_date = git_read_iso_time meta[:since]
 
 				documents = []
-				files.each_pair do |file_name, changes|
+				file_map.each_pair do |file_name, changes|
 
 					articles = []
 					changes.each do |change|
-						article = [change[:time], 1]
+						change_time = git_read_iso_time change[:time]						
+						time_diff = time_diff_in change_time, to_date
 
+						article = [time_diff[:hours], 1]
 						articles << article
 					end
 					
@@ -191,7 +238,10 @@ class VisualMerge
 				puts "Documents"
 				puts documents
 
-				documents
+				return {
+					:documents => documents,
+					:meta => meta
+				}
 			end 
 		end
 	end
