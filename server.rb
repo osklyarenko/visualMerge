@@ -12,9 +12,9 @@ get '/' do
 	File.read("public/index.html")  
 end
 
-get '/show' do
+get '/api/files_list' do
 	content_type :json
 
 	app = VisualMerge.new ['show']	
-	app.perform_action.to_json
+	app.perform_action[:documents].to_json
 end

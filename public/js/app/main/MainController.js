@@ -11,7 +11,7 @@ VisualMerge.controller('MainController', function($scope, $filter, $controller, 
   };
 
   function _success(response) {
-    $scope.chartData = API_RESPONSE_STUB; //response;
+    $scope.chartData = response;
     _load($scope.chartData);
   }
 
@@ -28,6 +28,5 @@ VisualMerge.controller('MainController', function($scope, $filter, $controller, 
     return $filter('filter')(data, name, 'name');
   }
 
-  //MainService.getData().then(_success, _error);
-  _success();
+  MainService.getData().then(_success, _error);  
 });

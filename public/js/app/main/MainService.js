@@ -6,13 +6,18 @@ VisualMerge.service('MainService', function($http, $q) {
   function _getData() {
     var request = $http({
       method: 'get',
-      url: URL,
-      params: {
-        action: 'get'
-      }
+      url: URL      
     });
 
     return request.then(handleSuccess, handleError);
+  }
+
+  function handleSuccess(data) {
+    return data.data;
+  }
+
+  function handleError(e) {
+    console.log(e);
   }
 
   return {

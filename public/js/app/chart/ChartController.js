@@ -70,7 +70,7 @@ VisualMerge.controller('ChartController', function($scope) {
         .attr("y", j*20+25)
         .attr("x",width+20)
         .attr("class","label")
-        .text(truncate(item['name'],30,"..."))
+        .text(item['name'])
         .style("fill", function(d) { return c(j); })
         .on("mouseover", mouseover)
         .on("mouseout", mouseout);

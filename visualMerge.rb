@@ -225,10 +225,13 @@ class VisualMerge
 						articles << article
 					end
 					
+					file_path = Pathname.new file_name
+					
 					document = {
 						:articles => articles,
 						:total => changes.size,
-						:name => file_name
+						:name => file_path.basename.to_s,
+						:full_name => file_name,
 					}
 
 					documents << document
