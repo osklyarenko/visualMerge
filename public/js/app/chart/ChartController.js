@@ -4,12 +4,15 @@ VisualMerge.controller('ChartController', function($scope) {
 
   var margin = { top: 20, right: 200, bottom: 0, left: 20 },
       width = 300,
-      height = 650,
+      height = 30,
+      itemHeight = 20,
       start_year = 2004,
       end_year = 2013;
 
   function _render(element) {
     var startTime = new Date;
+    var data = $scope.data;
+    var itemsCount = data.length;
 
     var fragment = document.createDocumentFragment();
     var c = d3.scale.category20c();
@@ -19,7 +22,7 @@ VisualMerge.controller('ChartController', function($scope) {
 
     var svg = d3.select(fragment).append("svg")
       .attr("width", width + margin.left + margin.right)
-      .attr("height", height + margin.top + margin.bottom)
+      .attr("height", height + margin.top + margin.bottom + itemsCount * itemHeight)
       //.style("position", "absolute")
       .append("g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -34,8 +37,8 @@ VisualMerge.controller('ChartController', function($scope) {
       .attr("transform", "translate(0," + 0 + ")")
       .call(xAxis);
 
-    for (var j = 0, l = $scope.data.length; j < l; j++) {
-      var item = $scope.data[j];
+    for (var j = 0; j < itemsCount; j++) {
+      var item = data[j];
       var g = svg.append("g").attr("class","journal");
 
       var circles = g.selectAll("circle")
