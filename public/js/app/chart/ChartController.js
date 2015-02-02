@@ -6,8 +6,8 @@ VisualMerge.controller('ChartController', function($scope) {
       width = 300,
       height = 30,
       itemHeight = 20,
-      start_year = 2004,
-      end_year = 2013;
+      start = $scope.start || 0,
+      end = $scope.end || 100;
 
   function _render(element) {
     var startTime = new Date;
@@ -27,9 +27,9 @@ VisualMerge.controller('ChartController', function($scope) {
       .append("g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    x.domain([start_year, end_year]);
+    x.domain([start, end]);
     var xScale = d3.scale.linear()
-      .domain([start_year, end_year])
+      .domain([start, end])
       .range([0, width]);
 
     svg.append("g")

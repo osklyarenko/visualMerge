@@ -12,6 +12,7 @@ VisualMerge.controller('MainController', function($scope, $filter, $controller, 
 
   function _success(response) {
     $scope.chartData = response.documents;
+    $scope.end = response.meta.hours_range;
     _load($scope.chartData);
   }
 
