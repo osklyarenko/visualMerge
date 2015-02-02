@@ -11,7 +11,7 @@ VisualMerge.controller('MainController', function($scope, $filter, $controller, 
   };
 
   function _success(response) {
-    $scope.chartData = response;
+    $scope.chartData = response.documents;
     _load($scope.chartData);
   }
 
@@ -28,5 +28,5 @@ VisualMerge.controller('MainController', function($scope, $filter, $controller, 
     return $filter('filter')(data, name, 'name');
   }
 
-  MainService.getData().then(_success, _error);  
+  MainService.getData().then(_success, _error);
 });
