@@ -5,12 +5,17 @@ VisualMerge.controller('ChartController', function($scope) {
   var margin = { top: 20, right: 200, bottom: 0, left: 20 },
       width = 300,
       height = 30,
-      itemHeight = 20,
-      start = $scope.start || 0,
-      end = $scope.end || 100;
+      itemHeight = 20;
+
+  function _setRange(start, end) {
+    $scope.start = start || 0;
+    $scope.end = end || 100;
+  }
 
   function _render(element) {
     var startTime = new Date;
+    var start = $scope.start;
+    var end = $scope.end;
     var data = $scope.data;
     var itemsCount = data.length;
 
@@ -27,9 +32,9 @@ VisualMerge.controller('ChartController', function($scope) {
       .append("g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    x.domain([start, end]);
+    x.domain([end, start]);
     var xScale = d3.scale.linear()
-      .domain([start, end])
+      .domain([end, start])
       .range([0, width]);
 
     svg.append("g")
@@ -106,4 +111,5 @@ VisualMerge.controller('ChartController', function($scope) {
   }
 
   $scope.render = _render;
+  $scope.setRange = _setRange;
 });
