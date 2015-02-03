@@ -109,19 +109,18 @@ class VisualMerge
 		}
 	end
 
-	def git_changed_files_since_yesterday(repo)		
-		yesterday = 1.day.ago.beginning_of_day
-
-		hash = git_oldest_hash_since GIT_REPO_HOME, yesterday
+	def git_files_changed_since(repo, since)		
+		
+		hash = git_oldest_hash_since GIT_REPO_HOME, since
 
 		changed_files = git_changed_files_in_hash_range GIT_REPO_HOME, "#{hash}~1", 'HEAD'
 
 		file_map = git_build_file_map_in_hash_range GIT_REPO_HOME, changed_files, "#{hash}~1", 'HEAD'
 		
 
-		time_diff = time_diff_in DateTime.now, yesterday
+		time_diff = time_diff_in DateTime.now, since
 		return {
-			:since => git_print_iso_time(yesterday),
+			:since => git_print_iso_time(since),
 			:to => git_print_iso_time(DateTime.now),
 			
 			:hours_range =>  time_diff[:hours],
@@ -162,6 +161,46 @@ class VisualMerge
 
 		return file_map
 	end
+	
+	def api_files_changed_since(since)
+		meta = git_files_changed_since '.', since
+
+		file_map = meta[:file_map]
+		hours_range = meta[:hours_range]
+		
+		to_date = git_read_iso_time meta[:to]
+		since_date = git_read_iso_time meta[:since]
+
+		documents = []
+		file_map.each_pair do |file_name, changes|
+
+			articles = []
+			changes.each do |change|
+				change_time = git_read_iso_time change[:time]						
+				time_diff = time_diff_in change_time, to_date
+
+				article = [time_diff[:hours], 1]
+				articles << article
+			end
+			
+			file_path = Pathname.new file_name
+			
+			document = {
+				:articles => articles,
+				:total => changes.size,
+				:name => file_path.basename.to_s,
+				:full_name => file_name,
+			}
+
+			documents << document
+			puts "#{changes.size}, #{file_name}"
+		end
+
+		return {
+			:documents => documents,
+			:meta => meta
+		}	
+	end
 
 	def perform_action()
 		case @action
@@ -197,55 +236,12 @@ class VisualMerge
 					:adapter => 'sqlite3',
 					:database => '.visualMerge/visualMerge.db'		
 				)
-				puts git_changed_files_since_yesterday '.'
+				puts git_changed_files_since '.', 1.day.ago.beginning_of_day
 			end
 		when 'show'
-			ensure_dir GIT_REPO_HOME do
-				ActiveRecord::Base.establish_connection(
-					:adapter => 'sqlite3',
-					:database => '.visualMerge/visualMerge.db'		
-				)
-			
-				meta = git_changed_files_since_yesterday '.'
-				file_map = meta[:file_map]
-				hours_range = meta[:hours_range]
-				
-				to_date = git_read_iso_time meta[:to]
-				since_date = git_read_iso_time meta[:since]
+			meta = git_changed_files_since '.', 1.day.ago.beginning_of_day
 
-				documents = []
-				file_map.each_pair do |file_name, changes|
-
-					articles = []
-					changes.each do |change|
-						change_time = git_read_iso_time change[:time]						
-						time_diff = time_diff_in change_time, to_date
-
-						article = [time_diff[:hours], 1]
-						articles << article
-					end
-					
-					file_path = Pathname.new file_name
-					
-					document = {
-						:articles => articles,
-						:total => changes.size,
-						:name => file_path.basename.to_s,
-						:full_name => file_name,
-					}
-
-					documents << document
-					puts "#{changes.size}, #{file_name}"
-				end
-
-				puts "Documents"
-				puts documents
-
-				return {
-					:documents => documents,
-					:meta => meta
-				}
-			end 
+			prepare_changeset_document
 		end
 	end
 end
