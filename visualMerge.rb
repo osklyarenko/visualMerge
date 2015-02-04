@@ -43,9 +43,8 @@ class VisualMerge
 		run_shell_parse_output "git log --pretty='%ci___%h'  --after '#{since}' | sort| head -n 1", repo do |pipe|
 			line = pipe.gets
 
-			_hash, _ = line.match(/^.*___(\w*)$/).captures
-			hash = _hash.strip if _hash 
-			# commit_time = DateTime.strptime line, '%Y-%m-%d %H:%M:%S %z'
+			hash, _ = line.match(/^.*___(\w*)$/).captures if line
+			hash = hash.strip if hash 
 		end
 
 		hash
@@ -113,7 +112,8 @@ class VisualMerge
 		
 		hash = git_oldest_hash_since GIT_REPO_HOME, since
 
-		changed_files = git_changed_files_in_hash_range GIT_REPO_HOME, "#{hash}~1", 'HEAD'
+		changed_files = []
+		changed_files = git_changed_files_in_hash_range GIT_REPO_HOME, "#{hash}~1", 'HEAD' unless hash == ''
 
 		file_map = git_build_file_map_in_hash_range GIT_REPO_HOME, changed_files, "#{hash}~1", 'HEAD'
 		
