@@ -161,6 +161,20 @@ class VisualMerge
 
 		return file_map
 	end
+
+	def sort_documents(documents)
+
+		documents.reject { |doc| doc[:articles].empty? }.sort do |left, right|
+
+			l_article, r_article = [left, right].map do |document|				
+				articles = document[:articles] 				
+
+				articles.min_by { |article|	article[0] } unless articles.empty?
+			end
+
+			l_article[0] <=> r_article[0]			
+		end
+	end
 	
 	def api_files_changed_since(since)
 		meta = git_files_changed_since '.', since
@@ -197,7 +211,7 @@ class VisualMerge
 		end
 
 		return {
-			:documents => documents,
+			:documents => sort_documents(documents),
 			:meta => meta
 		}	
 	end
