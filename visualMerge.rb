@@ -40,7 +40,7 @@ class VisualMerge
 	def git_oldest_hash_since(repo, since)
 		hash = ''
 
-		run_shell_parse_output "git log --pretty='%ci___%h'  --after '#{since}' | sort| head -n 1", repo do |pipe|
+		run_shell_parse_output "git log --pretty='%ci___%h'  --after '#{since}' | tail -n 1", repo do |pipe|
 			line = pipe.gets
 
 			hash, _ = line.match(/^.*___(\w*)$/).captures if line
