@@ -1,7 +1,7 @@
 
 VisualMerge.service('MainService', function($http, $q) {
 
-  var URL = 'api/files_list?count=2';
+  var URL = 'api/files_list?count=1';
 
   function _getData() {
     var request = $http({
