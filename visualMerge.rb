@@ -169,7 +169,7 @@ class VisualMerge
 			l_article, r_article = [left, right].map do |document|				
 				articles = document[:articles] 				
 
-				articles.min_by { |article|	article[0] } unless articles.empty?
+				articles.min_by { |article|	article[0] }
 			end
 
 			l_article[0] <=> r_article[0]			
