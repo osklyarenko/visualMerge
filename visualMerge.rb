@@ -48,6 +48,41 @@ class VisualMerge
 		end
 
 		hash
+	end
+
+	def git_most_recent_hash(repo, hashes)
+		sorted = git_sort_hashes_by_date repo, hashes
+
+		sorted.last.first
+	end
+
+	def git_sort_hashes_by_date(repo, hashes)
+		hash_to_ts = hashes.inject({}) do |map, hash|
+			iso_date = ''
+
+			run_shell_parse_output "git show --pretty=%ci --quiet #{hash}", repo do |pipe|
+				line = pipe.gets
+				
+				iso_date = line.strip
+			end
+
+			map[hash] = git_read_iso_time(iso_date)
+
+			map
+		end
+
+		hash_to_ts.sort_by {|left, right| right }
+	end
+
+	def git_show_parents(repo, hash)
+		parents = []
+		run_shell_parse_output "git log --pretty=%p -n 1 #{hash}", repo do |pipe|
+			line = pipe.gets
+
+			parents = line.split
+		end
+
+		parents
 	end	
 
 	def git_changed_files_in_hash_range(repo, old_hash, new_hash)
@@ -112,10 +147,13 @@ class VisualMerge
 		
 		hash = git_oldest_hash_since GIT_REPO_HOME, since
 
+		parents = git_show_parents GIT_REPO_HOME, hash
+		most_recent = git_most_recent_hash GIT_REPO_HOME, parents
+		
 		changed_files = []
-		changed_files = git_changed_files_in_hash_range GIT_REPO_HOME, "#{hash}~1", 'HEAD' unless hash == ''
+		changed_files = git_changed_files_in_hash_range GIT_REPO_HOME, "#{most_recent}", 'HEAD' unless hash == ''
 
-		file_map = git_build_file_map_in_hash_range GIT_REPO_HOME, changed_files, "#{hash}~1", 'HEAD'
+		file_map = git_build_file_map_in_hash_range GIT_REPO_HOME, changed_files, "#{most_recent}", 'HEAD'
 		
 
 		time_diff = time_diff_in DateTime.now, since
