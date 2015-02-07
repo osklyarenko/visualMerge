@@ -57,7 +57,7 @@ class VisualMerge
 	end
 
 	def git_sort_hashes_by_date(repo, hashes)
-		hash_to_ts = hashes.inject({}) do |map, hash|
+		hash_to_date = hashes.inject({}) do |map, hash|
 			iso_date = ''
 
 			run_shell_parse_output "git show --pretty=%ci --quiet #{hash}", repo do |pipe|
@@ -71,7 +71,7 @@ class VisualMerge
 			map
 		end
 
-		hash_to_ts.sort_by {|left, right| right }
+		hash_to_date.sort_by {|left, right| right }
 	end
 
 	def git_show_parents(repo, hash)
