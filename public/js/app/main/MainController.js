@@ -4,11 +4,21 @@ VisualMerge.controller('MainController', function($scope, $filter, $controller, 
   var chartEl = $('#chart').get(0);
   var chartController = $scope.$new();
   $controller('ChartController', { $scope: chartController });
+  $scope.params = {
+    type: 'day',
+    count: 1
+  };
 
-  $scope.change = function () {
+  $scope.filterChange = function () {
     var data = $scope.name ? _filer($scope.chartData, $scope.name) : $scope.chartData;
     _load(data);
   };
+
+  $scope.paramsChange = loadData;
+
+  function loadData() {
+    MainService.getData($scope.params).then(_success, _error);
+  }
 
   function _success(response) {
     var end = response.meta.hours_range;
@@ -31,5 +41,5 @@ VisualMerge.controller('MainController', function($scope, $filter, $controller, 
     return $filter('filter')(data, name, 'name');
   }
 
-  MainService.getData().then(_success, _error);
+  loadData();
 });
