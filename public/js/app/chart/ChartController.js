@@ -2,10 +2,13 @@
 VisualMerge.controller('ChartController', function($scope) {
   $scope.data = $scope.data || [];
 
-  var margin = { top: 20, right: 200, bottom: 0, left: 20 },
-      width = 300,
+  var $chartCnt = $('.chart-cnt'),
+      margin = { top: 20, right: 360, bottom: 0, left: 20 },
+      width = $chartCnt.width() - margin.right,
       height = 30,
-      itemHeight = 20;
+      itemHeight = 20,
+      minItemRadius = 6;
+
 
   function _setRange(start, end) {
     $scope.start = start || 0;
@@ -44,6 +47,7 @@ VisualMerge.controller('ChartController', function($scope) {
 
     for (var j = 0; j < itemsCount; j++) {
       var item = data[j];
+      var name = item['name'];
       var g = svg.append("g").attr("class","journal");
 
       var circles = g.selectAll("circle")
@@ -58,7 +62,7 @@ VisualMerge.controller('ChartController', function($scope) {
 
       var rScale = d3.scale.linear()
         .domain([0, d3.max(item['articles'], function(d) { return d[1]; })])
-        .range([2, 9]);
+        .range([2, minItemRadius]);
 
       circles
         .attr("cx", function(d, i) { return xScale(d[0]); })
@@ -76,9 +80,10 @@ VisualMerge.controller('ChartController', function($scope) {
 
       g.append("text")
         .attr("y", j*20+25)
-        .attr("x",width+20)
+        .attr("x", width+20)
         .attr("class","label")
-        .text(item['name'])
+        .attr("title", name)
+        .text(name)
         .style("fill", function(d) { return c(j); })
         .on("mouseover", mouseover)
         .on("mouseout", mouseout);
