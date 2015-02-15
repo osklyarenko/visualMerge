@@ -11,7 +11,7 @@ VisualMerge.controller('MainController', function($scope, $filter, $controller, 
 
   $scope.filterChange = function () {
     var data = $scope.name ? _filer($scope.chartData, $scope.name) : $scope.chartData;
-    _load(data);
+    _load(data, $scope.meta);
   };
 
   $scope.paramsChange = loadData;
@@ -25,15 +25,19 @@ VisualMerge.controller('MainController', function($scope, $filter, $controller, 
     chartController.setRange(0, end);
 
     $scope.chartData = response.documents;
-    _load($scope.chartData);
+    $scope.meta = response.meta;
+
+    _load($scope.chartData, $scope.meta);
   }
 
   function _error(response) {
     console.log('error:', response);
   }
 
-  function _load(data) {
-    chartController.data = data;
+  function _load(data, meta) {
+    chartController.documents = data; 
+    chartController.meta = meta;
+
     chartController.render(chartEl);
   }
 
