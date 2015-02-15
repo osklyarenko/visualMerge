@@ -224,15 +224,38 @@ class VisualMerge
 		since_date = git_read_iso_time meta[:since]
 
 		documents = []
+
+		min_change = 3
+		max_change = 13
+
 		file_map.each_pair do |file_name, changes|
 
-			articles = []
+			articles = []			
 			changes.each do |change|
 				change_time = git_read_iso_time change[:time]						
 				time_diff = time_diff_in change_time, to_date
 
-				article = [time_diff[:hours], 1]
+				change_size = 0
+				run_shell_parse_output "git diff --numstat #{change[:hash]}^1 #{file_name}", GIT_REPO_HOME do |pipe|
+					line = pipe.gets
+
+					insertions, deletions, _ = line.match(/\s*(\d+|\-)\s*(\d+|\-).*/).captures if line
+					change_size = (insertions.to_i + deletions.to_i) unless insertions == '-' or deletions == '-'
+				end
+
+				article = [time_diff[:hours], change_size]
 				articles << article
+
+				if change_size < min_change
+					min_change = change_size
+				end
+
+				if change_size > max_change
+					max_change = change_size
+				end
+				
+				min_change = change_size if change_size < min_change
+				max_change = change_size if change_size > max_change
 			end
 			
 			file_path = Pathname.new file_name
@@ -247,6 +270,9 @@ class VisualMerge
 			documents << document
 			puts "#{changes.size}, #{file_name}"
 		end
+
+		meta[:min_change] = min_change
+		meta[:max_change] = max_change
 
 		return {
 			:documents => sort_documents(documents),

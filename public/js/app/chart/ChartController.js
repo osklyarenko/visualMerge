@@ -7,8 +7,7 @@ VisualMerge.controller('ChartController', function($scope) {
       labelHeight = 20,
       labelWidth = 360,
       chartWidth = $chartCnt.width() - labelWidth,
-      chartHeight = 30,
-      dotMinRadius = 6;
+      chartHeight = 30;      
 
   function _setRange(start, end) {
     $scope.start = start || 0;
@@ -19,7 +18,10 @@ VisualMerge.controller('ChartController', function($scope) {
     var startTime = new Date;
     var start = $scope.start;
     var end = $scope.end;
-    var data = $scope.data;
+
+    var meta = $scope.meta;
+    var data = $scope.documents;
+    
     var itemsCount = data.length;
 
     var fragment = document.createDocumentFragment();
@@ -45,6 +47,29 @@ VisualMerge.controller('ChartController', function($scope) {
       .attr("transform", "translate(0," + 0 + ")")
       .call(xAxis);
 
+    var minChangeSize = 1;
+    var maxChangeSize = 1;
+
+    var dataItemsCount = data.length;
+    for(var j = 0; j < dataItemsCount; j++) {
+      var dataItem = data[j];
+      var articles = dataItem.articles;
+
+      var articlesCount = articles.length;
+      for (var k = 0; k < articlesCount; k++) {
+        var articleItem = articles[k];
+        var value = articleItem[1];
+
+        if (minChangeSize > value) {
+          minChangeSize = value;
+        }
+
+        if (maxChangeSize < value) {
+          maxChangeSize = value;
+        }
+      }
+    }
+
     for (var j = 0; j < itemsCount; j++) {
       var item = data[j];
       var name = item['name'];
@@ -64,13 +89,16 @@ VisualMerge.controller('ChartController', function($scope) {
         .append("text");
 
       var rScale = d3.scale.linear()
-        .domain([0, d3.max(value, function(d) { return d[1]; })])
-        .range([2, dotMinRadius]);
+        .domain([minChangeSize, maxChangeSize])
+        .range([5, 20]);
 
       circles
         .attr("cx", function(d, i) { return xScale(d[0]); })
         .attr("cy", j*20+20)
-        .attr("r", function(d) { return rScale(d[1]); })
+        .attr("r", function(d) { 
+          console.log(d[1]);
+          return rScale(d[1]); 
+        })
         .style("fill", function(d) { return color || c(j); });
 
       text
