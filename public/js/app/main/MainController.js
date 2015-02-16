@@ -5,7 +5,7 @@ VisualMerge.controller('MainController', function($scope, $filter, $controller, 
   var chartController = $scope.$new();
   $controller('ChartController', { $scope: chartController });
   $scope.params = {
-    type: 'day',
+    unit: 'day',
     count: 1
   };
 
