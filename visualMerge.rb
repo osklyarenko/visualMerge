@@ -40,7 +40,7 @@ class VisualMerge
 	def git_oldest_hash_since(repo, since)
 		hash = ''
 
-		run_shell_parse_output "git log --pretty='%ci___%h'  --after '#{since}' | tail -n 1", repo do |pipe|
+		run_shell_parse_output "git log --pretty='%ci___%H'  --after '#{since}' | tail -n 1", repo do |pipe|
 			line = pipe.gets
 
 			hash, _ = line.match(/^.*___(\w*)$/).captures if line
@@ -76,7 +76,7 @@ class VisualMerge
 
 	def git_show_parents(repo, hash)
 		parents = []
-		run_shell_parse_output "git log --pretty=%p -n 1 #{hash}", repo do |pipe|
+		run_shell_parse_output "git log --pretty=%P -n 1 #{hash}", repo do |pipe|
 			line = pipe.gets
 
 			parents = line.split
@@ -101,7 +101,7 @@ class VisualMerge
 		file_map = {}
 
 		changed_files.each do |file|
-			run_shell_parse_output "git log --pretty=%h___%ci --abbrev-commit #{old_hash}..#{new_hash} #{file}", repo do |pipe|
+			run_shell_parse_output "git log --pretty=%H___%ci --abbrev-commit #{old_hash}..#{new_hash} #{file}", repo do |pipe|
 				hashes = []
 				while hash = pipe.gets
 					hash.strip!
@@ -184,7 +184,7 @@ class VisualMerge
 
 		file_map = {}
 		files.each do |file|
-			run_shell_parse_output "git log --pretty=%h___%cD --abbrev-commit #{merge.old_head}..HEAD #{file}", repo do |pipe|
+			run_shell_parse_output "git log --pretty=%H___%cD --abbrev-commit #{merge.old_head}..HEAD #{file}", repo do |pipe|
 				hashes = []
 				while hash = pipe.gets
 					hash.strip!
