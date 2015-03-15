@@ -9,12 +9,12 @@ VisualMerge.controller('MainController', function($scope, $filter, $controller, 
     count: 1
   };
 
-  $scope.filterChange = function () {
+  $scope.submitFilter = function () {
     var data = $scope.name ? _filer($scope.chartData, $scope.name) : $scope.chartData;
     _load(data, $scope.meta);
   };
 
-  $scope.paramsChange = loadData;
+  $scope.submitParams = loadData;
 
   function loadData() {
     MainService.getData($scope.params).then(_success, _error);

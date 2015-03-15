@@ -1,7 +1,7 @@
 <div class="row">
   <div class="col-md-4 pull-right file-name-cnt">
     <div class="input-group input-group-sm">
-      <input type="text" class="form-control" ng-model="name" ng-change="filterChange()" placeholder="File name" aria-describedby="file-name">
+      <input type="text" class="form-control" ng-model="name" ng-change="submitFilter()" placeholder="File name" aria-describedby="file-name">
       <span class="input-group-addon" id="file-name">
         <span class="glyphicon glyphicon-filter" aria-hidden="true"></span>
       </span>
@@ -9,14 +9,20 @@
   </div>
 
   <div class="col-md-1 pull-right">
+    <button type="button" class="btn btn-primary btn-sm" ng-click="submitParams()" aria-label="Left Align" title="Submit">
+      <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+    </button>
+  </div>
+
+  <div class="col-md-1 pull-right">
     <div class="input-group-sm">
-      <input type="text" class="form-control" ng-model="params.count" ng-change="paramsChange()" placeholder="Count" /> <!-- type="number" -->
+      <input type="text" class="form-control" ng-model="params.count" placeholder="Count" />
     </div>
   </div>
 
   <div class="col-md-2 pull-right">
     <div class="input-group-sm">
-      <select class="form-control" ng-model="params.unit" ng-change="paramsChange()">
+      <select class="form-control" ng-model="params.unit">
         <option value="hour">Hours</option>
         <option value="day">Days</option>
         <option value="week">Weeks</option>
