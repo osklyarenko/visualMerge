@@ -74,6 +74,7 @@ VisualMerge.controller('ChartController', function($scope) {
       var item = data[j];
       var name = item['name'];
       var value = item['articles'];
+      var fullName = item['full_name'];
       var color = item['color'];
 
       var g = svg.append("g").attr("class", "journal");
@@ -117,7 +118,8 @@ VisualMerge.controller('ChartController', function($scope) {
         .text(name)
         .style("fill", function(d) { return c(j); })
         .on("mouseover", mouseover)
-        .on("mouseout", mouseout);
+        .on("mouseout", mouseout)
+        .append("title").text(fullName);
     }
 
     element.innerHTML = '';
