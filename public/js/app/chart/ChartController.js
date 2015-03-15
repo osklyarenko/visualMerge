@@ -72,7 +72,7 @@ VisualMerge.controller('ChartController', function($scope) {
 
     for (var j = 0; j < itemsCount; j++) {
       var item = data[j];
-      var name = item['name'];
+      var name = item['unique_name'];
       var value = item['articles'];
       var fullName = item['full_name'];
       var color = item['color'];
